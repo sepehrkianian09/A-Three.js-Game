@@ -1,11 +1,15 @@
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCSSExtractPlugin = require('mini-css-extract-plugin')
+const ESLintPlugin = require('eslint-webpack-plugin');
 const path = require('path')
 
+// const rootFilePath = path.resolve(__dirname, '../src/script.js')
+const rootFilePath = path.resolve(__dirname, '../src/jesus.ts')
+const rootHtmlFilePath = path.resolve(__dirname, '../src/index.html')
+
 module.exports = {
-    // entry: path.resolve(__dirname, '../src/script.js'),
-    entry: path.resolve(__dirname, '../src/jesus.ts'),
+    entry: rootFilePath,
     output:
     {
         filename: 'bundle.[contenthash].js',
@@ -20,35 +24,30 @@ module.exports = {
             ]
         }),
         new HtmlWebpackPlugin({
-            template: path.resolve(__dirname, '../src/index.html'),
+            template: rootHtmlFilePath,
             minify: true
         }),
-        new MiniCSSExtractPlugin()
+        new MiniCSSExtractPlugin(),
+        new ESLintPlugin({
+            context: rootFilePath,
+            extensions: ["js", "ts", "tsx", "json"],
+            exclude: ["node_modules"],
+            fix: true,
+            formatter: "stylish",
+        })
     ],
     module:
     {
         rules:
         [
             // HTML
-            {
-                test: /\.(html)$/,
-                use: ['html-loader']
-            },
+            {test: /\.(html)$/, use: ['html-loader']},
 
             // JS
-            {
-                test: /\.js$/,
-                exclude: /node_modules/,
-                use:
-                [
-                    'babel-loader'
-                ]
-            },
+            {test: /\.js$/, exclude: /node_modules/, use: ['babel-loader']},
 
             // TS
-            {
-                test: /\.tsx?$/, use: ["ts-loader"], exclude: /node_modules/
-            },
+            {test: /\.tsx?$/, use: ["ts-loader"], exclude: /node_modules/},
 
             // CSS
             {
