@@ -1,3 +1,5 @@
+import {Mesh, Quaternion, Vector3} from "three";
+
 console.log("jesus")
 console.log("holy jesus")
 
@@ -7,12 +9,20 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import * as dat from 'dat.gui'
 import * as CANNON from 'cannon-es'
+import {Body} from "objects/Body";
+import {Vec3} from "math/Vec3";
+import {Shape} from "shapes/Shape";
+import {Material} from "material/Material";
+import {CollisionType} from "world/Narrowphase";
+import {ContactEquation} from "cannon-es/src/equations/ContactEquation";
+
+interface VectorType {x: number; y: number; z: number;}
 
 /**
  * Debug
  */
 const gui = new dat.GUI()
-const debugObject = {}
+const debugObject: {[key: string]: () => void} = {}
 
 debugObject.createSphere = () =>
 {
@@ -62,7 +72,8 @@ gui.add(debugObject, 'reset')
  * Base
  */
 // Canvas
-const canvas = document.querySelector('canvas.webgl')
+// const canvas: HTMLCanvasElement|undefined = document.getElementsByTagName('canvas')
+    const canvas: HTMLCanvasElement|undefined = document.getElementsByTagName('canvas').item(9) || undefined
 
 // Scene
 const scene = new THREE.Scene()
@@ -72,7 +83,11 @@ const scene = new THREE.Scene()
  */
 const hitSound = new Audio('/sounds/hit.mp3')
 
-const playHitSound = (collision) =>
+const playHitSound = (collision: {
+    type: typeof Body.COLLIDE_EVENT_NAME
+    body: Body
+    contact: ContactEquation
+}) =>
 {
     const impactStrength = collision.contact.getImpactVelocityAlongNormal()
 
@@ -130,7 +145,7 @@ world.addBody(floorBody)
 /**
  * Utils
  */
-const objectsToUpdate = []
+const objectsToUpdate: {mesh: Mesh, body: Body}[] = []
 
 // Create sphere
 const sphereGeometry = new THREE.SphereBufferGeometry(1, 20, 20)
@@ -140,27 +155,31 @@ const sphereMaterial = new THREE.MeshStandardMaterial({
     envMap: environmentMapTexture
 })
 
-const createSphere = (radius, position) =>
+const createBody = (shape: Shape, material: Material, position: VectorType): Body => {
+    const body = new CANNON.Body({
+        mass: 1,
+        position: new CANNON.Vec3(0, 3, 0),
+        shape: shape,
+        material: material
+    })
+    body.position.copy(new Vec3(position.x, position.y, position.z))
+    body.addEventListener('collide', playHitSound)
+    world.addBody(body)
+    return body
+}
+
+const createSphere = (radius: number, position: {x: number, y: number, z: number}) =>
 {
     // Three.js mesh
     const mesh = new THREE.Mesh(sphereGeometry, sphereMaterial)
     mesh.castShadow = true
     mesh.scale.set(radius, radius, radius)
-    mesh.position.copy(position)
+    mesh.position.copy(new Vector3(position.x, position.y, position.z))
     scene.add(mesh)
 
     // Cannon.js body
     const shape = new CANNON.Sphere(radius)
-
-    const body = new CANNON.Body({
-        mass: 1,
-        position: new CANNON.Vec3(0, 3, 0),
-        shape: shape,
-        material: defaultMaterial
-    })
-    body.position.copy(position)
-    body.addEventListener('collide', playHitSound)
-    world.addBody(body)
+    const body: Body = createBody(shape, defaultMaterial, position)
 
     // Save in objects
     objectsToUpdate.push({ mesh, body })
@@ -173,27 +192,18 @@ const boxMaterial = new THREE.MeshStandardMaterial({
     roughness: 0.4,
     envMap: environmentMapTexture
 })
-const createBox = (width, height, depth, position) =>
+const createBox = (width: number, height: number, depth: number, position: VectorType) =>
 {
     // Three.js mesh
     const mesh = new THREE.Mesh(boxGeometry, boxMaterial)
     mesh.scale.set(width, height, depth)
     mesh.castShadow = true
-    mesh.position.copy(position)
+    mesh.position.copy(new Vector3(position.x, position.y, position.z))
     scene.add(mesh)
 
     // Cannon.js body
     const shape = new CANNON.Box(new CANNON.Vec3(width * 0.5, height * 0.5, depth * 0.5))
-
-    const body = new CANNON.Body({
-        mass: 1,
-        position: new CANNON.Vec3(0, 3, 0),
-        shape: shape,
-        material: defaultMaterial
-    })
-    body.position.copy(position)
-    body.addEventListener('collide', playHitSound)
-    world.addBody(body)
+    const body: Body = createBody(shape, defaultMaterial, position)
 
     // Save in objects
     objectsToUpdate.push({ mesh, body })
@@ -297,8 +307,10 @@ const tick = () =>
 
     for(const object of objectsToUpdate)
     {
-        object.mesh.position.copy(object.body.position)
-        object.mesh.quaternion.copy(object.body.quaternion)
+        const position = object.body.position
+        object.mesh.position.copy(new Vector3(position.x, position.y, position.z))
+        const quaternion = object.body.quaternion
+        object.mesh.quaternion.copy(new Quaternion(quaternion.x, quaternion.y, quaternion.z, quaternion.w))
     }
 
     // Update controls
