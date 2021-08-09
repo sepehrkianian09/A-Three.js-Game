@@ -12,6 +12,7 @@ module.exports = merge(
     commonConfiguration,
     {
         mode: 'development',
+        devtool: 'inline-source-map',
         devServer:
         {
             host: '0.0.0.0',
@@ -31,7 +32,7 @@ module.exports = merge(
                 const localIp = ip.v4.sync()
                 const domain1 = `http${https}://${localIp}:${port}`
                 const domain2 = `http${https}://localhost:${port}`
-                
+
                 console.log(`Project running at:\n  - ${infoColor(domain1)}\n  - ${infoColor(domain2)}`)
             }
         }

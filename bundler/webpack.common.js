@@ -36,6 +36,9 @@ module.exports = {
             formatter: "stylish",
         })
     ],
+    resolve: {
+        extensions: ["tsx", "ts", "jsx", "js", "json"]
+    },
     module:
     {
         rules:

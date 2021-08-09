@@ -1,5 +1,52 @@
 {
   "compilerOptions": {
-
-  }
+    // types won't have null|undefined option by default
+    "strictNullChecks": true,
+    // For allowing js inside our code
+    "allowJs": true,
+    "checkJs": true,
+    "maxNodeModuleJsDepth": 0,
+    // For Allowing source map in our project
+    // To add webpack with it, you must put property "'devtool': 'inline-source-map'" to webpack.dev config
+    "sourceMap": true,
+    // allow the compiler, to treat commonJs/amd/umd modules just like ES6
+    "esModuleInterop": true,
+    // you can say "import THREE from 'three'" instead of "import * as THREE from 'three'"
+    "allowSyntheticDefaultImports": true,
+    // if true, it won't strict check generic function types
+    "noStrictGenericChecks": false,
+    "target": "esnext",
+    "module": "esnext",
+    "strict": true,
+    "jsx": "preserve",
+    "importHelpers": true,
+    "moduleResolution": "node",
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "types": ["webpack-env"],
+    "paths": {
+      "@/*": ["src/*"]
+    },
+    "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
+  },
+  // this is used for js type checking, as the compiler internally imports types.
+  // you can find types, in @typesearch
+  "typeAcquisition": {
+//    "enable": false,
+//    "include": [],
+//    "disableFilenameBasedTypeAcquisition": false,
+    // excludes typeAcquisition for these packages
+//    "exclude": ["jest", "mocha"]
+  },
+  // For Configuring how Typescript "--watch" command works.
+  "watchOptions": {
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.vue",
+    "tests/**/*.ts",
+    "tests/**/*.tsx"
+  ],
+  "exclude": ["node_modules"]
 }
