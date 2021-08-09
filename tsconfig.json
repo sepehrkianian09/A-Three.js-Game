@@ -1,11 +1,11 @@
 {
   "compilerOptions": {
     // types won't have null|undefined option by default
-    "strictNullChecks": true,
+    "strictNullChecks": false,
     // For allowing js inside our code
-    "allowJs": true,
-    "checkJs": true,
-    "maxNodeModuleJsDepth": 0,
+//    "allowJs": true,
+//    "checkJs": true,
+//    "maxNodeModuleJsDepth": 0,
     // For Allowing source map in our project
     // To add webpack with it, you must put property "'devtool': 'inline-source-map'" to webpack.dev config
     "sourceMap": true,
@@ -15,18 +15,24 @@
     "allowSyntheticDefaultImports": true,
     // if true, it won't strict check generic function types
     "noStrictGenericChecks": false,
+    // this will ignore error "'this' implicitly has type 'any' because it does not have a type annotation."
+    "noImplicitThis": false,
+    // this will ignore error "Parameter '...' implicitly has an 'any' type."
+    "noImplicitAny": false,
+    "skipLibCheck": true,
+    // this will skip the default lib check of libraries, and increase compile speed
+    "skipDefaultLibCheck": false,
     "target": "esnext",
     "module": "esnext",
     "strict": true,
     "jsx": "preserve",
     "importHelpers": true,
     "moduleResolution": "node",
-    "skipLibCheck": true,
     "baseUrl": ".",
-    "types": ["webpack-env"],
-    "paths": {
-      "@/*": ["src/*"]
-    },
+//    "types": ["webpack-env"],
+//    "paths": {
+//      "@/*": ["src/*"]
+//    },
     "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
   },
   // this is used for js type checking, as the compiler internally imports types.
@@ -42,11 +48,10 @@
   "watchOptions": {
   },
   "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "src/**/*.vue",
-    "tests/**/*.ts",
-    "tests/**/*.tsx"
+    "src/*.ts",
+    "src/*.tsx"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules"
+  ]
 }

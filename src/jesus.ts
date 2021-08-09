@@ -1,22 +1,24 @@
 import {Mesh, Quaternion, Vector3} from "three";
-
-console.log("jesus")
-console.log("holy jesus")
-
-
 import './style.css'
 import * as THREE from 'three'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
 import * as dat from 'dat.gui'
 import * as CANNON from 'cannon-es'
 import {Body} from "objects/Body";
-import {Vec3} from "math/Vec3";
 import {Shape} from "shapes/Shape";
 import {Material} from "material/Material";
-import {CollisionType} from "world/Narrowphase";
 import {ContactEquation} from "cannon-es/src/equations/ContactEquation";
+import { Vec3 } from "cannon-es";
 
-interface VectorType {x: number; y: number; z: number;}
+/**
+ * types
+ */
+interface VectorType {
+    x: number
+    y: number
+    z: number
+}
+
 
 /**
  * Debug
@@ -73,7 +75,7 @@ gui.add(debugObject, 'reset')
  */
 // Canvas
 // const canvas: HTMLCanvasElement|undefined = document.getElementsByTagName('canvas')
-    const canvas: HTMLCanvasElement|undefined = document.getElementsByTagName('canvas').item(9) || undefined
+const canvas: HTMLCanvasElement|undefined = document.getElementsByTagName('canvas').item(0) || undefined
 
 // Scene
 const scene = new THREE.Scene()
@@ -252,21 +254,6 @@ const sizes = {
     height: window.innerHeight
 }
 
-window.addEventListener('resize', () =>
-{
-    // Update sizes
-    sizes.width = window.innerWidth
-    sizes.height = window.innerHeight
-
-    // Update camera
-    camera.aspect = sizes.width / sizes.height
-    camera.updateProjectionMatrix()
-
-    // Update renderer
-    renderer.setSize(sizes.width, sizes.height)
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-})
-
 /**
  * Camera
  */
@@ -289,6 +276,24 @@ renderer.shadowMap.enabled = true
 renderer.shadowMap.type = THREE.PCFSoftShadowMap
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+
+/**
+ * On Resize
+ */
+window.addEventListener('resize', () =>
+{
+    // Update sizes
+    sizes.width = window.innerWidth
+    sizes.height = window.innerHeight
+
+    // Update camera
+    camera.aspect = sizes.width / sizes.height
+    camera.updateProjectionMatrix()
+
+    // Update renderer
+    renderer.setSize(sizes.width, sizes.height)
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+})
 
 /**
  * Animate

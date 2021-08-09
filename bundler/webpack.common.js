@@ -37,7 +37,9 @@ module.exports = {
         })
     ],
     resolve: {
-        extensions: ["tsx", "ts", "jsx", "js", "json"]
+        // extensions: ["tsx", "ts", "jsx", "js", "json"]
+        extensions: [".wasm", ".ts", ".tsx", ".mjs", ".cjs", ".js", ".json"],
+        modules: [path.resolve(__dirname, 'src'), 'node_modules']
     },
     module:
     {
