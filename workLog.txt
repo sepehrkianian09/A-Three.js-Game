@@ -2,3 +2,4 @@ learning webPack bundler & eslint to configure the project -> 2Hours
 learn how to configure typescript, and put configurations -> 1Hour
 debug the whole bundling and running dev servers stuff -> 2~2.5Hours
 init a simple Renderer, resizer, updater engine -> 2.5Hours
+debug the engine, and match those with organized Jesus -> 1Hours

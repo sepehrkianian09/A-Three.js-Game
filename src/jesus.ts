@@ -9,15 +9,9 @@ import {Shape} from "shapes/Shape";
 import {Material} from "material/Material";
 import {ContactEquation} from "cannon-es/src/equations/ContactEquation";
 import { Vec3 } from "cannon-es";
-
-/**
- * types
- */
-interface VectorType {
-    x: number
-    y: number
-    z: number
-}
+import {PointerLockControls} from "three/examples/jsm/controls/PointerLockControls";
+import {toVector3, VectorType} from "./utils/Vectors";
+import {toQuaternion} from "./utils/Quaternions";
 
 
 /**
@@ -264,6 +258,7 @@ scene.add(camera)
 
 // Controls
 const controls = new OrbitControls(camera, canvas)
+const pointerLockControls = new PointerLockControls(camera, canvas)
 controls.enableDamping = true
 
 /**
@@ -299,23 +294,23 @@ window.addEventListener('resize', () =>
  * Animate
  */
 const clock = new THREE.Clock()
-let oldElapsedTime = 0
+const oldElapsedTime = 0
 
 const tick = () =>
 {
-    const elapsedTime = clock.getElapsedTime()
-    const deltaTime = elapsedTime - oldElapsedTime
-    oldElapsedTime = elapsedTime
+    // const elapsedTime = clock.getElapsedTime()
+    // const deltaTime = elapsedTime - oldElapsedTime
+    // oldElapsedTime = elapsedTime
+    const deltaTime = clock.getDelta()
 
+    console.log(deltaTime)
     // Update physics
     world.step(1 / 60, deltaTime, 3)
 
     for(const object of objectsToUpdate)
     {
-        const position = object.body.position
-        object.mesh.position.copy(new Vector3(position.x, position.y, position.z))
-        const quaternion = object.body.quaternion
-        object.mesh.quaternion.copy(new Quaternion(quaternion.x, quaternion.y, quaternion.z, quaternion.w))
+        object.mesh.position.copy(toVector3(object.body.position))
+        object.mesh.quaternion.copy(toQuaternion(object.body.quaternion))
     }
 
     // Update controls
