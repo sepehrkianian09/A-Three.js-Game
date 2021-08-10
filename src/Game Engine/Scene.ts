@@ -1,18 +1,19 @@
 
 import * as THREE from 'three'
 import * as CANNON from 'cannon-es'
-import TimeUpdater from "./Updater";
+import TimeUpdater from "./TimeUpdater";
 import PhysicalMesh from "./PhysicalMesh";
 
-class Scene extends THREE.Scene implements TimeUpdater {
+export default class Scene extends THREE.Scene implements TimeUpdater {
     equivalentWorld: CANNON.World
     readonly dt:number = 1/60
     readonly maxSteps:number = 3
 
     physicalMeshes: PhysicalMesh[]
 
-    constructor() {
+    constructor(equivalentWorld: CANNON.World) {
         super();
+        this.equivalentWorld = equivalentWorld
     }
 
     add(...object): this {
