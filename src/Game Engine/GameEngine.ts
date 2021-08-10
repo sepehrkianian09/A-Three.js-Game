@@ -22,6 +22,7 @@ export default class GameEngine implements Resizer, TimeUpdater{
         this.clock = clock
         this.sizes = sizesFunc();
 
+        this.resize(sizesFunc())
         window.addEventListener('resize', () => {
             this.resize(sizesFunc())
         })

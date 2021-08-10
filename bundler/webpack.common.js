@@ -5,7 +5,7 @@ const ESLintPlugin = require('eslint-webpack-plugin');
 const path = require('path')
 
 // const rootFilePath = path.resolve(__dirname, '../src/script.js')
-const rootFilePath = path.resolve(__dirname, '../src/jesus.ts')
+const rootFilePath = path.resolve(__dirname, '../src/organizedJesus.ts')
 const rootHtmlFilePath = path.resolve(__dirname, '../src/index.html')
 
 module.exports = {
