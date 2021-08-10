@@ -1,16 +1,38 @@
 import Scene from "./Scene";
 import Renderer from "./Renderer";
 import TimeUpdater from "./TimeUpdater";
-import Resizer, {Sizes} from "./Resizer";
-import {Camera} from "three";
-import {ResizerCamera} from "./Camera";
+import Resizer, {Sizes, windowSizes} from "./Resizer";
+import * as THREE from 'three'
+import {CameraType} from "./Camera";
 
 export default class GameEngine implements Resizer, TimeUpdater{
     scene: Scene
     renderer: Renderer
-    camera: Camera | ResizerCamera
+    camera: CameraType
     cameraController: TimeUpdater
+    clock: THREE.Clock
     sizes: Sizes
+
+
+    constructor(scene: Scene, renderer: Renderer, camera: CameraType, cameraController: TimeUpdater, clock: THREE.Clock, sizesFunc:(()=>Sizes)=windowSizes) {
+        this.scene = scene;
+        this.renderer = renderer;
+        this.camera = camera;
+        this.cameraController = cameraController;
+        this.clock = clock
+        this.sizes = sizesFunc();
+
+        window.addEventListener('resize', () => {
+            this.resize(sizesFunc())
+        })
+
+        const startUpdate = () => {
+            this.update(this.clock.getDelta())
+            window.requestAnimationFrame(startUpdate)
+        }
+
+        startUpdate()
+    }
 
     resize(sizes: Sizes): void {
         this.sizes = sizes

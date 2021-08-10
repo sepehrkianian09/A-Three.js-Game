@@ -10,3 +10,5 @@ export class PerspectiveCamera extends THREE.PerspectiveCamera implements Resize
         this.updateProjectionMatrix()
     }
 }
+
+export type CameraType = Camera | ResizerCamera

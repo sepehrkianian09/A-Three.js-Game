@@ -6,3 +6,7 @@ export interface Sizes {
 export default interface Resizer {
     resize: (sizes: Sizes) => void
 }
+
+export function windowSizes(): Sizes {
+    return {width: window.innerWidth, height: window.innerHeight}
+}
