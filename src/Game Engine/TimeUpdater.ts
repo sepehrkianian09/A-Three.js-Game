@@ -1,3 +1,3 @@
 export default interface TimeUpdater {
-    update: (deltaTime: number) => void;
+    update: (deltaTime?: number) => void;
 }
