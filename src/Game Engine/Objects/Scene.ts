@@ -1,7 +1,7 @@
 
 import * as THREE from 'three'
 import * as CANNON from 'cannon-es'
-import TimeUpdater from "./TimeUpdater";
+import TimeUpdater from "../interfaces/TimeUpdater";
 import PhysicalMesh from "./PhysicalMesh";
 import {Object3D} from "three";
 

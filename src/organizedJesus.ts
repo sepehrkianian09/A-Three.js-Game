@@ -1,4 +1,4 @@
-import {Vector3} from "three";
+import {Mesh, Vector3} from "three";
 import './style.css'
 import * as THREE from 'three'
 import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
@@ -13,10 +13,12 @@ import { Vec3 } from "cannon-es";
 import {VectorType} from "./utils/Vectors";
 // import {toQuaternion} from "./utils/Quaternions";
 import Renderer from "./Game Engine/Renderer";
-import Scene from "./Game Engine/Scene";
-import PhysicalMesh from "./Game Engine/PhysicalMesh";
-import {PerspectiveCamera} from "./Game Engine/Camera";
+import Scene from "./Game Engine/Objects/Scene";
+import PhysicalMesh from "./Game Engine/Objects/PhysicalMesh";
+import {PerspectiveCamera} from "./Game Engine/Objects/Camera";
 import GameEngine from "./Game Engine/GameEngine";
+import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader";
+import {ThirdPersonCameraController} from "./Game Engine/controllers/ThirdPersonCameraController";
 
 
 /**
@@ -73,7 +75,10 @@ gui.add(debugObject, 'reset')
 // const canvas: HTMLCanvasElement|undefined = document.getElementsByTagName('canvas')
 const canvas: HTMLCanvasElement|undefined = document.getElementsByTagName('canvas').item(0) || undefined
 
-// Physical Scene
+/**
+ * Physical Scene
+ */
+// World
 const world = new CANNON.World()
 world.broadphase = new CANNON.SAPBroadphase(world)
 world.allowSleep = true
@@ -91,7 +96,10 @@ const defaultContactMaterial = new CANNON.ContactMaterial(
 )
 world.defaultContactMaterial = defaultContactMaterial
 
+// Scene
 const scene = new Scene(world)
+
+// const mixer = new THREE.AnimationMixer()
 
 /**
  * Sounds
@@ -128,6 +136,7 @@ const environmentMapTexture = cubeTextureLoader.load([
     '/textures/environmentMaps/0/pz.png',
     '/textures/environmentMaps/0/nz.png'
 ])
+scene.environment = environmentMapTexture
 
 // Create sphere
 const sphereGeometry = new THREE.SphereBufferGeometry(1, 20, 20)
@@ -183,7 +192,7 @@ const createBox = (width: number, height: number, depth: number, position: Vecto
     scene.add(mesh)
 }
 
-createBox(1, 1.5, 2, { x: 0, y: 3, z: 0 })
+// createBox(1, 1.5, 2, { x: 0, y: 3, z: 0 })
 
 /**
  * Floor
@@ -227,6 +236,26 @@ directionalLight.position.set(5, 5, 5)
 scene.add(directionalLight)
 
 /**
+ * Fox
+ */
+const gltfLoader = new GLTFLoader()
+gltfLoader.load(
+    '/models/Fox/glTF/Fox.gltf',
+    (gltf) =>
+    {
+        gltf.scene.scale.set(0.025, 0.025, 0.025)
+        controls.person = <Mesh>gltf.scene.children[0]
+        scene.add(gltf.scene)
+
+        console.log(gltf);
+        // Animation
+        // mixer = new THREE.AnimationMixer(gltf.scene)
+        // const action = mixer.clipAction(gltf.animations[1])
+        // action.play()
+    }
+)
+
+/**
  * Camera
  */
 // Base camera
@@ -235,7 +264,13 @@ camera.position.set(- 3, 3, 3)
 scene.add(camera)
 
 // Controls
-const controls = new OrbitControls(camera, canvas)
+const controls = new ThirdPersonCameraController(camera, canvas)
+// controls.enableKeys = true
+gui.add(controls, 'enableKeys', false)
+gui.add(controls, 'autoRotate')
+gui.add(controls, 'enablePan')
+gui.add(controls, 'screenSpacePanning')
+console.log(controls)
 // const pointerLockControls = new PointerLockControls(camera, canvas)
 controls.enableDamping = true
 

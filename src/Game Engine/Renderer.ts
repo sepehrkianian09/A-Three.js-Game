@@ -1,5 +1,5 @@
 import {WebGLRenderer} from "three";
-import Resizer, {Sizes} from "./Resizer";
+import Resizer, {Sizes} from "./interfaces/Resizer";
 
 export default class Renderer extends WebGLRenderer implements Resizer {
     resize(sizes: Sizes): void {

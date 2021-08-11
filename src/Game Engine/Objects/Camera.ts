@@ -1,5 +1,5 @@
 import {Camera} from "three";
-import Resizer, {Sizes} from "./Resizer";
+import Resizer, {Sizes} from "../interfaces/Resizer";
 import * as THREE from 'three'
 
 export interface ResizerCamera extends Camera, Resizer {}

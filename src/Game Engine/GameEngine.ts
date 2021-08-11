@@ -1,9 +1,9 @@
-import Scene from "./Scene";
+import Scene from "./Objects/Scene";
 import Renderer from "./Renderer";
-import TimeUpdater from "./TimeUpdater";
-import Resizer, {Sizes, windowSizes} from "./Resizer";
+import TimeUpdater from "./interfaces/TimeUpdater";
+import Resizer, {Sizes, windowSizes} from "./interfaces/Resizer";
 import * as THREE from 'three'
-import {CameraType} from "./Camera";
+import {CameraType} from "./Objects/Camera";
 
 export default class GameEngine implements Resizer, TimeUpdater{
     scene: Scene
