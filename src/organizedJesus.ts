@@ -57,7 +57,7 @@ gui.add(debugObject, 'createBox')
 // Reset
 debugObject.reset = () =>
 {
-    for(const physicalMesh of scene.physicalMeshes)
+    for(const physicalMesh of scene.needUpdatePhysicalMeshes)
     {
         // Remove body
         physicalMesh.equivalentBody.removeEventListener('collide', playHitSound)
@@ -155,7 +155,7 @@ const createSphere = (radius: number, position: {x: number, y: number, z: number
     const shape = new CANNON.Sphere(radius)
     const body: Body = createBody(shape, defaultMaterial, position)
     // Three.js mesh
-    const mesh = new PhysicalMesh(sphereGeometry, sphereMaterial, body)
+    const mesh = new PhysicalMesh(sphereGeometry, sphereMaterial, body, true)
     mesh.castShadow = true
     mesh.scale.set(radius, radius, radius)
     mesh.position.copy(new Vector3(position.x, position.y, position.z))
@@ -176,7 +176,7 @@ const createBox = (width: number, height: number, depth: number, position: Vecto
     const body: Body = createBody(shape, defaultMaterial, position)
 
     // Three.js mesh
-    const mesh = new PhysicalMesh(boxGeometry, boxMaterial, body)
+    const mesh = new PhysicalMesh(boxGeometry, boxMaterial, body, true)
     mesh.scale.set(width, height, depth)
     mesh.castShadow = true
     mesh.position.copy(new Vector3(position.x, position.y, position.z))
