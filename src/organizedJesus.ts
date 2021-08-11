@@ -63,8 +63,8 @@ debugObject.reset = () =>
     for(const physicalMesh of scene.needUpdatePhysicalMeshes)
     {
         // Remove body
-        physicalMesh.equivalentBody.removeEventListener('collide', playHitSound)
-        scene.remove(physicalMesh)
+        physicalMesh.body.removeEventListener('collide', playHitSound)
+        scene.removePhysicalMesh(physicalMesh)
     }
 }
 gui.add(debugObject, 'reset')
@@ -165,11 +165,12 @@ const createSphere = (radius: number, position: {x: number, y: number, z: number
     const shape = new CANNON.Sphere(radius)
     const body: Body = createBody(shape, defaultMaterial, position)
     // Three.js mesh
-    const mesh = new PhysicalMesh(sphereGeometry, sphereMaterial, body, true)
+    const mesh = new THREE.Mesh(sphereGeometry, sphereMaterial)
     mesh.castShadow = true
     mesh.scale.set(radius, radius, radius)
     mesh.position.copy(new Vector3(position.x, position.y, position.z))
-    scene.add(mesh)
+    const physicalMesh = new PhysicalMesh(mesh, body, true)
+    scene.addPhysicalMesh(physicalMesh)
 }
 
 // Create box
@@ -186,11 +187,12 @@ const createBox = (width: number, height: number, depth: number, position: Vecto
     const body: Body = createBody(shape, defaultMaterial, position)
 
     // Three.js mesh
-    const mesh = new PhysicalMesh(boxGeometry, boxMaterial, body, true)
+    const mesh = new THREE.Mesh(boxGeometry, boxMaterial)
     mesh.scale.set(width, height, depth)
     mesh.castShadow = true
     mesh.position.copy(new Vector3(position.x, position.y, position.z))
-    scene.add(mesh)
+    const physicalMesh = new PhysicalMesh(mesh, body, true)
+    scene.addPhysicalMesh(physicalMesh)
 }
 
 // createBox(1, 1.5, 2, { x: 0, y: 3, z: 0 })
@@ -206,18 +208,17 @@ floorBody.addShape(floorShape)
 floorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(- 1, 0, 0), Math.PI * 0.5)
 
 // Mesh
-const floor = new PhysicalMesh(
-    new THREE.PlaneBufferGeometry(10, 10),
+const floorMesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(10, 10),
     new THREE.MeshStandardMaterial({
         color: '#777777',
         metalness: 0.3,
         roughness: 0.4,
         envMap: environmentMapTexture
-    }), floorBody
-)
-floor.receiveShadow = true
-floor.rotation.x = - Math.PI * 0.5
-scene.add(floor)
+    }))
+floorMesh.receiveShadow = true
+floorMesh.rotation.x = - Math.PI * 0.5
+const floor = new PhysicalMesh(floorMesh, floorBody)
+scene.addPhysicalMesh(floor)
 
 /**
  * Lights
@@ -249,18 +250,12 @@ gltfLoader.load(
         const shape = new CANNON.Box(new CANNON.Vec3(1, 1, 1))
         const body: Body = createBody(shape, defaultMaterial, new CANNON.Vec3(0, 0, 0))
 
-        const person = gltf.scene.children[0] as PhysicalMesh
+        const person = new PhysicalMesh(gltf.scene.children[0], body, true)
         console.log(person)
-        person.equivalentBody = body
-        person.needsUpdate = true
-        person.scale.set(0.025, 0.025, 0.025)
-        scene.add(person)
+        person.mesh.scale.set(0.025, 0.025, 0.025)
+        scene.addPhysicalMesh(person)
 
         console.log(gltf);
-        // Animation
-        // mixer = new THREE.AnimationMixer(gltf.scene)
-        // const action = mixer.clipAction(gltf.animations[1])
-        // action.play()
         const states = {
             'idle': {animation: gltf.animations[0]},
             'walk': {animation: gltf.animations[1]},
@@ -272,7 +267,7 @@ gltfLoader.load(
             'a': {state: 'walk', move: {direction: {x: -1, y: 0, z: 0}, speed: 10}},
             'd': {state: 'walk', move: {direction: {x: 1, y: 0, z: 0}, speed: 10}},
         }
-        thirdPersonCameraController.person = person
+        thirdPersonCameraController.person = person.mesh
         const personController = new PersonController(person, states, inputs)
         personController.enable()
     }

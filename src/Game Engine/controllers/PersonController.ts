@@ -27,7 +27,7 @@ export default class PersonController {
         this.states = states;
         this.inputs = inputs;
         this.selectedInput = undefined
-        this.animationMixer = new THREE.AnimationMixer(this.person)
+        this.animationMixer = new THREE.AnimationMixer(this.person.mesh)
         // make animationAction for every animationClip from Start
         for (const statesKey in this.states) {
             const selectedState = this.states[statesKey]
@@ -38,17 +38,20 @@ export default class PersonController {
     enable() {
         document.onkeyup = (keyEvent) => {
             if (keyEvent.key in this.inputs) {
+                console.log(keyEvent);
                 this.enableInput(this.inputs[keyEvent.key])
             }
         }
         document.onkeydown = (keyEvent) => {
             if (keyEvent.key in this.inputs) {
+                console.log(keyEvent);
                 this.disableInput(this.inputs[keyEvent.key])
             }
         }
     }
 
     enableInput(input: Input): void {
+        console.log('enable')
         this.selectedInput = input
         // play input animation
         if (this.selectedInput.state in this.states) {
@@ -63,6 +66,7 @@ export default class PersonController {
 
     disableInput(input=this.selectedInput) {
         if (input) {
+            console.log('disable')
             if (input.state in this.states) {
                 this.states[input.state].action.stop()
             }

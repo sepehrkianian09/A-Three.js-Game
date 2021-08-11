@@ -18,30 +18,24 @@ export default class Scene extends THREE.Scene implements TimeUpdater {
         this.equivalentWorld = equivalentWorld
     }
 
-    add(...object: Object3D[]): this {
-        const out = super.add(...object);
-        for (const object3D of object) {
-            if (object3D instanceof PhysicalMesh) {
-                this.physicalMeshes.push(object3D)
-                this.equivalentWorld.addBody(object3D.equivalentBody)
-                if (object3D.needsUpdate) {
-                    this.needUpdatePhysicalMeshes.push(object3D)
+    addPhysicalMesh(...physicalMeshes: PhysicalMesh[]): this {
+        const out = super.add(...physicalMeshes.map(value => value.mesh));
+        for (const physicalMesh of physicalMeshes) {
+                this.physicalMeshes.push(physicalMesh)
+                this.equivalentWorld.addBody(physicalMesh.body)
+                if (physicalMesh.needsUpdate) {
+                    this.needUpdatePhysicalMeshes.push(physicalMesh)
                 }
-            }
         }
         return out
     }
 
-    remove(...object: Object3D[]): this {
-        const out = super.remove(...object);
-        for (const object3D of object) {
-            if (object3D instanceof PhysicalMesh) {
-                this.physicalMeshes = this.physicalMeshes.filter(physicalMesh => physicalMesh !== object3D)
-                this.equivalentWorld.removeBody(object3D.equivalentBody)
-                if (object3D.needsUpdate) {
-                    this.needUpdatePhysicalMeshes = this.needUpdatePhysicalMeshes.filter(physicalMesh => physicalMesh !== object3D)
-                }
-            }
+    removePhysicalMesh(...physicalMeshes: PhysicalMesh[]): this {
+        const out = super.remove(...physicalMeshes.map(value => value.mesh));
+        this.physicalMeshes = this.physicalMeshes.filter(value => !physicalMeshes.includes(value))
+        this.needUpdatePhysicalMeshes = this.needUpdatePhysicalMeshes.filter(value => !physicalMeshes.includes(value))
+        for (const object3D of physicalMeshes) {
+                this.equivalentWorld.removeBody(object3D.body)
         }
         return out
     }

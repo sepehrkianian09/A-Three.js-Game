@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 import TimeUpdater from "../interfaces/TimeUpdater";
 import * as CANNON from 'cannon-es'
-import {Vector3} from "three";
+import {Object3D, Vector3} from "three";
 
 class VectorType {
     x: number
@@ -14,13 +14,14 @@ class VectorType {
 // }
 
 
-export default class PhysicalMesh extends THREE.Mesh implements TimeUpdater {
-    equivalentBody: CANNON.Body
+export default class PhysicalMesh implements TimeUpdater {
+    mesh: Object3D
+    body: CANNON.Body
     needsUpdate: boolean
 
-    constructor(geometry: THREE.BufferGeometry, material: THREE.Material | THREE.Material[], body?: CANNON.Body, needsUpdate=false) {
-        super(geometry, material);
-        this.equivalentBody = body
+    constructor(mesh: Object3D, body?: CANNON.Body, needsUpdate=false) {
+        this.mesh = mesh
+        this.body = body
         this.needsUpdate = needsUpdate
         if (!body) {
             this.initDefaultBody()
@@ -28,18 +29,18 @@ export default class PhysicalMesh extends THREE.Mesh implements TimeUpdater {
     }
 
     update(): void {
-        if (this.equivalentBody) {
-            const newPosition = this.equivalentBody.position
-            this.position.copy(new Vector3(newPosition.x, newPosition.y, newPosition.z))
+        if (this.body) {
+            const newPosition = this.body.position
+            this.mesh.position.copy(new Vector3(newPosition.x, newPosition.y, newPosition.z))
             // we don't have rotation property in Body.
             // we just have quaternion
-            const newQuaternion = this.equivalentBody.quaternion
-            this.quaternion.copy(new THREE.Quaternion(newQuaternion.x, newQuaternion.y, newQuaternion.z, newQuaternion.w))
+            const newQuaternion = this.body.quaternion
+            this.mesh.quaternion.copy(new THREE.Quaternion(newQuaternion.x, newQuaternion.y, newQuaternion.z, newQuaternion.w))
         }
     }
 
     move(direction={x: 0, y: 0, z:0}, speed=0): void {
-        this.equivalentBody.velocity = new CANNON.Vec3(speed * direction.x, speed * direction.y, speed * direction.z)
+        this.body.velocity = new CANNON.Vec3(speed * direction.x, speed * direction.y, speed * direction.z)
         // set mesh's direction to that direction, and rotate it to there
         // const vecFrom = this.rotation
         // const vecTo =
@@ -47,7 +48,7 @@ export default class PhysicalMesh extends THREE.Mesh implements TimeUpdater {
     }
 
     stopMoving(): void {
-        this.equivalentBody.velocity = new CANNON.Vec3(0, 0, 0)
+        this.body.velocity = new CANNON.Vec3(0, 0, 0)
     }
 
     // todo create body based on geometry and material
