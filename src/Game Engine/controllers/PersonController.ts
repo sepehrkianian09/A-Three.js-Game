@@ -37,14 +37,14 @@ export default class PersonController {
 
     enable() {
         document.onkeyup = (keyEvent) => {
+            console.log(keyEvent);
             if (keyEvent.key in this.inputs) {
-                console.log(keyEvent);
                 this.enableInput(this.inputs[keyEvent.key])
             }
         }
         document.onkeydown = (keyEvent) => {
+            console.log(keyEvent);
             if (keyEvent.key in this.inputs) {
-                console.log(keyEvent);
                 this.disableInput(this.inputs[keyEvent.key])
             }
         }

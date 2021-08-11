@@ -246,13 +246,9 @@ gltfLoader.load(
     (gltf) =>
     {
 
-        // Cannon.js body
-        const shape = new CANNON.Box(new CANNON.Vec3(1, 1, 1))
-        const body: Body = createBody(shape, defaultMaterial, new CANNON.Vec3(0, 0, 0))
-
-        const person = new PhysicalMesh(gltf.scene.children[0], body, true)
+        gltf.scene.children[0].scale.set(0.025, 0.025, 0.025)
+        const person = new PhysicalMesh(gltf.scene.children[0])
         console.log(person)
-        person.mesh.scale.set(0.025, 0.025, 0.025)
         scene.addPhysicalMesh(person)
 
         console.log(gltf);

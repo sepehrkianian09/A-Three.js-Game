@@ -1,7 +1,8 @@
 import * as THREE from 'three'
 import TimeUpdater from "../interfaces/TimeUpdater";
 import * as CANNON from 'cannon-es'
-import {Object3D, Vector3} from "three";
+import {Box3, Object3D, Vector3} from "three";
+import {Body} from "objects/Body";
 
 class VectorType {
     x: number
@@ -17,6 +18,7 @@ class VectorType {
 export default class PhysicalMesh implements TimeUpdater {
     mesh: Object3D
     body: CANNON.Body
+    readonly defaultMaterial = new CANNON.Material('default')
     needsUpdate: boolean
 
     constructor(mesh: Object3D, body?: CANNON.Body, needsUpdate=false) {
@@ -24,7 +26,7 @@ export default class PhysicalMesh implements TimeUpdater {
         this.body = body
         this.needsUpdate = needsUpdate
         if (!body) {
-            this.initDefaultBody()
+            this.body = this.getDefaultBody()
         }
     }
 
@@ -52,7 +54,18 @@ export default class PhysicalMesh implements TimeUpdater {
     }
 
     // todo create body based on geometry and material
-    private initDefaultBody(): void {
+    private getDefaultBody(): CANNON.Body {
         //todo
+        const boxModel = new Box3().setFromObject(this.mesh)
+        console.log('boxMod')
+        console.log(boxModel)
+        const extents = boxModel.max.sub(boxModel.min).multiplyScalar(0.1)
+        const shape = new CANNON.Box(new CANNON.Vec3(extents.x, extents.y, extents.z))
+        return new CANNON.Body({
+            mass: 1,
+            position: new CANNON.Vec3(0, 0, 0),
+            shape: shape,
+            material: this.defaultMaterial
+        })
     }
 }
