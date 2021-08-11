@@ -1,6 +1,7 @@
 import PhysicalMesh from "../Objects/PhysicalMesh";
-import {AnimationAction, AnimationClip, Vector3} from "three";
+import {AnimationAction, AnimationClip} from "three";
 import * as THREE from 'three'
+import {VectorType} from "../../utils/Vectors";
 
 interface State {
     animation: AnimationClip
@@ -8,9 +9,8 @@ interface State {
 }
 interface Input {
     state: string
-    action?: AnimationAction
     move?: {
-        direction: Vector3
+        direction: VectorType
         speed: number
     }
     // stable: boolean
@@ -26,7 +26,7 @@ export default class PersonController {
         this.person = person;
         this.states = states;
         this.inputs = inputs;
-        this.selectedInput = null
+        this.selectedInput = undefined
         this.animationMixer = new THREE.AnimationMixer(this.person)
         // make animationAction for every animationClip from Start
         for (const statesKey in this.states) {
@@ -41,9 +41,14 @@ export default class PersonController {
                 this.enableInput(this.inputs[keyEvent.key])
             }
         }
+        document.onkeydown = (keyEvent) => {
+            if (keyEvent.key in this.inputs) {
+                this.disableInput(this.inputs[keyEvent.key])
+            }
+        }
     }
 
-    enableInput(input: Input) {
+    enableInput(input: Input): void {
         this.selectedInput = input
         // play input animation
         if (this.selectedInput.state in this.states) {
@@ -58,16 +63,16 @@ export default class PersonController {
 
     disableInput(input=this.selectedInput) {
         if (input) {
-            if (this.selectedInput.state in this.states) {
-                this.states[this.selectedInput.state].action.stop()
+            if (input.state in this.states) {
+                this.states[input.state].action.stop()
             }
             // make the input move from the start
-            if (this.selectedInput.move) {
+            if (input.move) {
                 // esma hamin bashe?
                 this.person.stopMoving()
             }
             if (this.selectedInput === input) {
-                this.selectedInput = null
+                this.selectedInput = undefined
             }
         }
     }

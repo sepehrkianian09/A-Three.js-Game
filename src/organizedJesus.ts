@@ -19,6 +19,7 @@ import {PerspectiveCamera} from "./Game Engine/Objects/Camera";
 import GameEngine from "./Game Engine/GameEngine";
 import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader";
 import {ThirdPersonCameraController} from "./Game Engine/controllers/ThirdPersonCameraController";
+import PersonController from "./Game Engine/controllers/PersonController";
 
 
 /**
@@ -243,15 +244,37 @@ gltfLoader.load(
     '/models/Fox/glTF/Fox.gltf',
     (gltf) =>
     {
-        gltf.scene.scale.set(0.025, 0.025, 0.025)
-        controls.person = <Mesh>gltf.scene.children[0]
-        scene.add(gltf.scene)
+
+        // Cannon.js body
+        const shape = new CANNON.Box(new CANNON.Vec3(1, 1, 1))
+        const body: Body = createBody(shape, defaultMaterial, new CANNON.Vec3(0, 0, 0))
+
+        const person = gltf.scene.children[0] as PhysicalMesh
+        console.log(person)
+        person.equivalentBody = body
+        person.needsUpdate = true
+        person.scale.set(0.025, 0.025, 0.025)
+        scene.add(person)
 
         console.log(gltf);
         // Animation
         // mixer = new THREE.AnimationMixer(gltf.scene)
         // const action = mixer.clipAction(gltf.animations[1])
         // action.play()
+        const states = {
+            'idle': {animation: gltf.animations[0]},
+            'walk': {animation: gltf.animations[1]},
+            'run': {animation: gltf.animations[2]}
+        }
+        const inputs = {
+            'w': {state: 'walk', move: {direction: {x: 0, y: 0, z: -1}, speed: 10}},
+            's': {state: 'walk', move: {direction: {x: 0, y: 0, z: 1}, speed: 10}},
+            'a': {state: 'walk', move: {direction: {x: -1, y: 0, z: 0}, speed: 10}},
+            'd': {state: 'walk', move: {direction: {x: 1, y: 0, z: 0}, speed: 10}},
+        }
+        thirdPersonCameraController.person = person
+        const personController = new PersonController(person, states, inputs)
+        personController.enable()
     }
 )
 
@@ -264,15 +287,15 @@ camera.position.set(- 3, 3, 3)
 scene.add(camera)
 
 // Controls
-const controls = new ThirdPersonCameraController(camera, canvas)
+const thirdPersonCameraController = new ThirdPersonCameraController(camera, canvas)
 // controls.enableKeys = true
-gui.add(controls, 'enableKeys', false)
-gui.add(controls, 'autoRotate')
-gui.add(controls, 'enablePan')
-gui.add(controls, 'screenSpacePanning')
-console.log(controls)
+gui.add(thirdPersonCameraController, 'enableKeys', false)
+gui.add(thirdPersonCameraController, 'autoRotate')
+gui.add(thirdPersonCameraController, 'enablePan')
+gui.add(thirdPersonCameraController, 'screenSpacePanning')
+console.log(thirdPersonCameraController)
 // const pointerLockControls = new PointerLockControls(camera, canvas)
-controls.enableDamping = true
+thirdPersonCameraController.enableDamping = true
 
 /**
  * Renderer
@@ -284,4 +307,4 @@ renderer.shadowMap.enabled = true
 renderer.shadowMap.type = THREE.PCFSoftShadowMap
 
 const clock = new THREE.Clock()
-const gameEngine = new GameEngine(scene, renderer, camera, controls, clock)
+const gameEngine = new GameEngine(scene, renderer, camera, thirdPersonCameraController, clock)
