@@ -16,10 +16,12 @@ class VectorType {
 
 export default class PhysicalMesh extends THREE.Mesh implements TimeUpdater {
     equivalentBody: CANNON.Body
+    readonly needsUpdate: boolean
 
-    constructor(geometry: THREE.BufferGeometry, material: THREE.Material | THREE.Material[], body: CANNON.Body) {
+    constructor(geometry: THREE.BufferGeometry, material: THREE.Material | THREE.Material[], body: CANNON.Body, needsUpdate=false) {
         super(geometry, material);
         this.equivalentBody = body
+        this.needsUpdate = needsUpdate
     }
 
     update(): void {

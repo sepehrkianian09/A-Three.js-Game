@@ -11,6 +11,7 @@ export default class Scene extends THREE.Scene implements TimeUpdater {
     readonly maxSteps:number = 3
 
     physicalMeshes: PhysicalMesh[] = []
+    needUpdatePhysicalMeshes: PhysicalMesh[] = []
 
     constructor(equivalentWorld: CANNON.World) {
         super();
@@ -23,6 +24,9 @@ export default class Scene extends THREE.Scene implements TimeUpdater {
             if (object3D instanceof PhysicalMesh) {
                 this.physicalMeshes.push(object3D)
                 this.equivalentWorld.addBody(object3D.equivalentBody)
+                if (object3D.needsUpdate) {
+                    this.needUpdatePhysicalMeshes.push(object3D)
+                }
             }
         }
         return out
@@ -34,6 +38,9 @@ export default class Scene extends THREE.Scene implements TimeUpdater {
             if (object3D instanceof PhysicalMesh) {
                 this.physicalMeshes = this.physicalMeshes.filter(physicalMesh => physicalMesh !== object3D)
                 this.equivalentWorld.removeBody(object3D.equivalentBody)
+                if (object3D.needsUpdate) {
+                    this.needUpdatePhysicalMeshes = this.needUpdatePhysicalMeshes.filter(physicalMesh => physicalMesh !== object3D)
+                }
             }
         }
         return out
