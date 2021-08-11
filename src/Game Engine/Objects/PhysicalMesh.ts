@@ -1,7 +1,8 @@
 import * as THREE from 'three'
-import TimeUpdater from "./TimeUpdater";
+import TimeUpdater from "../interfaces/TimeUpdater";
 import * as CANNON from 'cannon-es'
 import {Vector3} from "three";
+import {Vec3} from "math/Vec3";
 
 class VectorType {
     x: number
@@ -35,4 +36,15 @@ export default class PhysicalMesh extends THREE.Mesh implements TimeUpdater {
         }
     }
 
+    move(direction={x: 0, y: 0, z:0}, speed=0): void {
+        this.equivalentBody.velocity = new Vec3(speed * direction.x, speed * direction.y, speed * direction.z)
+        // set mesh's direction to that direction, and rotate it to there
+        // const vecFrom = this.rotation
+        // const vecTo =
+        // this.rotateOnAxis()
+    }
+
+    stopMoving(): void {
+        this.equivalentBody.velocity = new Vec3(0, 0, 0)
+    }
 }
