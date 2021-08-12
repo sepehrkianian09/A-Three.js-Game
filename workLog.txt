@@ -3,3 +3,5 @@ learn how to configure typescript, and put configurations -> 1Hour
 debug the whole bundling and running dev servers stuff -> 2~2.5Hours
 init a simple Renderer, resizer, updater engine -> 2.5Hours
 debug the engine, and match those with organized Jesus -> 1Hours
+1th try, for physics controller engine -> 3Hours
+initting animations for loader -> 2Hours
