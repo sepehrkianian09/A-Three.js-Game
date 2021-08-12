@@ -3,21 +3,33 @@ import TimeUpdater from "../interfaces/TimeUpdater";
 import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
 
 
-export class ThirdPersonCameraController extends OrbitControls implements TimeUpdater {
+export class ThirdPersonCameraController implements TimeUpdater {
     person: Object3D
+    cameraController: OrbitControls
 
     constructor(object: Camera, domElement: HTMLElement, person?: Mesh) {
-        super(object, domElement);
+        this.cameraController = new OrbitControls(object, domElement);
         this.person = person
+        this.cameraController.addEventListener('change', event => {
+            // console.log('camera controller changed')
+            // console.log(event)
+        })
     }
 
-    update(): boolean {
-        const returnThing = super.update()
+
+    update(): void {
         if (this.person) {
-            console.log('ffff')
             const nextTarget = this.person.position
-            this.target.set(nextTarget.x, nextTarget.y, nextTarget.z)
+            // this.cameraController.object.
+            // console.log('next target')
+            // console.log(nextTarget)
+            this.cameraController.target.set(nextTarget.x, nextTarget.y, nextTarget.z)
         }
-        return returnThing
+        // return returnThing
+        this.cameraController.update();
     }
+
+// update(): boolean {
+
+    // }
 }

@@ -247,10 +247,9 @@ gltfLoader.load(
     {
 
         gltf.scene.children[0].scale.set(0.025, 0.025, 0.025)
-        const person = new PhysicalMesh(gltf.scene.children[0])
+        const person = new PhysicalMesh(gltf.scene.children[0], undefined, true, scene)
         console.log(person)
         scene.addPhysicalMesh(person)
-
         console.log(gltf);
         const states = {
             'idle': {animation: gltf.animations[0]},
@@ -263,9 +262,11 @@ gltfLoader.load(
             'a': {state: 'walk', move: {direction: {x: -1, y: 0, z: 0}, speed: 10}},
             'd': {state: 'walk', move: {direction: {x: 1, y: 0, z: 0}, speed: 10}},
         }
+        // todo check thirdPerson Controller too.
         thirdPersonCameraController.person = person.mesh
         const personController = new PersonController(person, states, inputs)
         personController.enable()
+        gameEngine.personController = personController
     }
 )
 
@@ -280,13 +281,14 @@ scene.add(camera)
 // Controls
 const thirdPersonCameraController = new ThirdPersonCameraController(camera, canvas)
 // controls.enableKeys = true
-gui.add(thirdPersonCameraController, 'enableKeys', false)
-gui.add(thirdPersonCameraController, 'autoRotate')
-gui.add(thirdPersonCameraController, 'enablePan')
-gui.add(thirdPersonCameraController, 'screenSpacePanning')
+// gui.add(thirdPersonCameraController, 'enableKeys', false)
+// gui.add(thirdPersonCameraController, 'autoRotate')
+// gui.add(thirdPersonCameraController, 'enablePan')
+// thirdPersonCameraController.cameraController.addEventListener('')
+thirdPersonCameraController.cameraController.enableDamping = true
 console.log(thirdPersonCameraController)
 // const pointerLockControls = new PointerLockControls(camera, canvas)
-thirdPersonCameraController.enableDamping = true
+// thirdPersonCameraController.enableDamping = true
 
 /**
  * Renderer
@@ -298,4 +300,4 @@ renderer.shadowMap.enabled = true
 renderer.shadowMap.type = THREE.PCFSoftShadowMap
 
 const clock = new THREE.Clock()
-const gameEngine = new GameEngine(scene, renderer, camera, thirdPersonCameraController, clock)
+const gameEngine = new GameEngine(scene, renderer, camera, thirdPersonCameraController, undefined, clock)

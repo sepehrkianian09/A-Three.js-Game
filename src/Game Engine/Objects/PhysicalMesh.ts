@@ -1,8 +1,9 @@
 import * as THREE from 'three'
 import TimeUpdater from "../interfaces/TimeUpdater";
 import * as CANNON from 'cannon-es'
-import {Box3, Object3D, Vector3} from "three";
+import {Box3, Material, Mesh, Object3D, Vector3} from "three";
 import {Body} from "objects/Body";
+import Scene from "./Scene";
 
 class VectorType {
     x: number
@@ -20,11 +21,13 @@ export default class PhysicalMesh implements TimeUpdater {
     body: CANNON.Body
     readonly defaultMaterial = new CANNON.Material('default')
     needsUpdate: boolean
+    scene: Scene
 
-    constructor(mesh: Object3D, body?: CANNON.Body, needsUpdate=false) {
+    constructor(mesh: Object3D, body?: CANNON.Body, needsUpdate=false, scene=undefined) {
         this.mesh = mesh
         this.body = body
         this.needsUpdate = needsUpdate
+        this.scene = scene
         if (!body) {
             this.body = this.getDefaultBody()
         }
@@ -57,15 +60,24 @@ export default class PhysicalMesh implements TimeUpdater {
     private getDefaultBody(): CANNON.Body {
         //todo
         const boxModel = new Box3().setFromObject(this.mesh)
+        const extents = boxModel.max.sub(boxModel.min).multiplyScalar(1)
         console.log('boxMod')
         console.log(boxModel)
-        const extents = boxModel.max.sub(boxModel.min).multiplyScalar(0.1)
-        const shape = new CANNON.Box(new CANNON.Vec3(extents.x, extents.y, extents.z))
-        return new CANNON.Body({
+        const shape = new CANNON.Box(new CANNON.Vec3(extents.x, extents.y, extents.z).scale(0.5))
+        const body = new CANNON.Body({
             mass: 1,
             position: new CANNON.Vec3(0, 0, 0),
             shape: shape,
             material: this.defaultMaterial
         })
+        body.position.set(0, extents.y, 0)
+        if (this.scene) {
+            const boxGeom = new THREE.BoxGeometry(extents.x, extents.y, extents.z)
+            const material = new THREE.MeshBasicMaterial({wireframe: true})
+            const mesh = new Mesh(boxGeom, material)
+            mesh.position.set(0, extents.y * 0.5, 0)
+            this.scene.add(mesh)
+        }
+        return body
     }
 }
