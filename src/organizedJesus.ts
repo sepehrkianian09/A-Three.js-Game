@@ -20,6 +20,7 @@ import GameEngine from "./Game Engine/GameEngine";
 import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader";
 import {ThirdPersonCameraController} from "./Game Engine/controllers/ThirdPersonCameraController";
 import PersonController from "./Game Engine/controllers/PersonController";
+import cannonDebugger from 'cannon-es-debugger'
 
 
 /**
@@ -96,6 +97,14 @@ const defaultContactMaterial = new CANNON.ContactMaterial(
     }
 )
 world.defaultContactMaterial = defaultContactMaterial
+world.addContactMaterial(new CANNON.ContactMaterial(
+    new CANNON.Material('Person'),
+    defaultMaterial,
+    {
+        friction: 0,
+        restitution: 0.7
+    }
+))
 
 // Scene
 const scene = new Scene(world)
@@ -183,15 +192,15 @@ const boxMaterial = new THREE.MeshStandardMaterial({
 const createBox = (width: number, height: number, depth: number, position: VectorType) =>
 {
     // Cannon.js body
-    const shape = new CANNON.Box(new CANNON.Vec3(width * 0.5, height * 0.5, depth * 0.5))
-    const body: Body = createBody(shape, defaultMaterial, position)
+    // const shape = new CANNON.Box(new CANNON.Vec3(width * 0.5, height * 0.5, depth * 0.5))
+    // const body: Body = createBody(shape, defaultMaterial, position)
 
     // Three.js mesh
     const mesh = new THREE.Mesh(boxGeometry, boxMaterial)
     mesh.scale.set(width, height, depth)
     mesh.castShadow = true
     mesh.position.copy(new Vector3(position.x, position.y, position.z))
-    const physicalMesh = new PhysicalMesh(mesh, body, true)
+    const physicalMesh = new PhysicalMesh(mesh, undefined, true)
     scene.addPhysicalMesh(physicalMesh)
 }
 
@@ -249,6 +258,10 @@ gltfLoader.load(
         gltf.scene.children[0].scale.set(0.025, 0.025, 0.025)
         gltf.scene.children[0].position.set(0, 0, 0)
         const person = new PhysicalMesh(gltf.scene.children[0], undefined, true, scene)
+        person.body.material = new CANNON.Material('Person')
+        // person.body.material.friction = 0
+        // person.body.material.restitution = 0
+        // person.body.mass =
         console.log(person)
         scene.addPhysicalMesh(person)
         console.log(gltf);
@@ -302,3 +315,4 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap
 
 const clock = new THREE.Clock()
 const gameEngine = new GameEngine(scene, renderer, camera, thirdPersonCameraController, undefined, clock)
+cannonDebugger(scene, world.bodies)

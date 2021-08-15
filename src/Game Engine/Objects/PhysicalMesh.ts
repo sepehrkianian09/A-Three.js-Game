@@ -90,14 +90,14 @@ export default class PhysicalMesh implements TimeUpdater {
         // set the position of the body, to the center of the box
         body.position.set(boxPosition.x, boxPosition.y, boxPosition.z)
         // show the body wireframe in the scene, by creating a box geometry
-        if (this.scene) {
-            const boxGeom = new THREE.BoxGeometry(extents.x, extents.y, extents.z)
-            const material = new THREE.MeshBasicMaterial({wireframe: true})
-            const mesh = new Mesh(boxGeom, material)
-            mesh.position.copy(boxPosition)
-            this.scene.add(mesh)
-            this.meshEquivalentForBody = mesh
-        }
+        // if (this.scene) {
+        //     const boxGeom = new THREE.BoxGeometry(extents.x, extents.y, extents.z)
+        //     const material = new THREE.MeshBasicMaterial({wireframe: true})
+        //     const mesh = new Mesh(boxGeom, material)
+        //     mesh.position.copy(boxPosition)
+        //     this.scene.add(mesh)
+        //     this.meshEquivalentForBody = mesh
+        // }
         return body
     }
 }
