@@ -247,6 +247,7 @@ gltfLoader.load(
     {
 
         gltf.scene.children[0].scale.set(0.025, 0.025, 0.025)
+        gltf.scene.children[0].position.set(0, 0, 0)
         const person = new PhysicalMesh(gltf.scene.children[0], undefined, true, scene)
         console.log(person)
         scene.addPhysicalMesh(person)

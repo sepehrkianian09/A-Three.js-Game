@@ -18,6 +18,7 @@ class VectorType {
 
 export default class PhysicalMesh implements TimeUpdater {
     mesh: Object3D
+    box: Box3
     body: CANNON.Body
     readonly defaultMaterial = new CANNON.Material('default')
     needsUpdate: boolean
@@ -35,8 +36,16 @@ export default class PhysicalMesh implements TimeUpdater {
 
     update(): void {
         if (this.body) {
-            const newPosition = this.body.position
-            this.mesh.position.copy(new Vector3(newPosition.x, newPosition.y, newPosition.z))
+            let newPosition: CANNON.Vec3 | Vector3 = this.body.position
+            newPosition = new Vector3(newPosition.x, newPosition.y, newPosition.z)
+            if (this.box) {
+                this.box = new Box3().setFromObject(this.mesh)
+                const meshOffset = this.mesh.position.sub(this.box.getCenter(new Vector3()))
+                // console.log(this.box.getCenter(new Vector3()))
+                // console.log(this.mesh.position)
+                newPosition = newPosition.add(meshOffset)
+            }
+            this.mesh.position.copy(newPosition)
             // we don't have rotation property in Body.
             // we just have quaternion
             const newQuaternion = this.body.quaternion
@@ -56,13 +65,10 @@ export default class PhysicalMesh implements TimeUpdater {
         this.body.velocity = new CANNON.Vec3(0, 0, 0)
     }
 
-    // todo create body based on geometry and material
     private getDefaultBody(): CANNON.Body {
-        //todo
-        const boxModel = new Box3().setFromObject(this.mesh)
-        const extents = boxModel.max.sub(boxModel.min).multiplyScalar(1)
-        console.log('boxMod')
-        console.log(boxModel)
+        const box = new Box3().setFromObject(this.mesh)
+        this.box = box
+        const extents = box.max.sub(box.min).multiplyScalar(1)
         const shape = new CANNON.Box(new CANNON.Vec3(extents.x, extents.y, extents.z).scale(0.5))
         const body = new CANNON.Body({
             mass: 1,
@@ -70,14 +76,18 @@ export default class PhysicalMesh implements TimeUpdater {
             shape: shape,
             material: this.defaultMaterial
         })
-        body.position.set(0, extents.y, 0)
+        const newPosition = box.getCenter(new Vector3())
+        body.position.set(newPosition.x, newPosition.y, newPosition.z)
         if (this.scene) {
             const boxGeom = new THREE.BoxGeometry(extents.x, extents.y, extents.z)
             const material = new THREE.MeshBasicMaterial({wireframe: true})
             const mesh = new Mesh(boxGeom, material)
             mesh.position.set(0, extents.y * 0.5, 0)
+            console.log(mesh)
+            // this.mesh = mesh
             this.scene.add(mesh)
         }
         return body
+        // return undefined
     }
 }
