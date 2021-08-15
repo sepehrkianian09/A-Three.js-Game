@@ -18,11 +18,15 @@ class VectorType {
 
 export default class PhysicalMesh implements TimeUpdater {
     mesh: Object3D
-    box: Box3
     body: CANNON.Body
     readonly defaultMaterial = new CANNON.Material('default')
     needsUpdate: boolean
     scene: Scene
+
+    // update options
+    dontHaveBody: boolean
+    centerPositionOffSet: Vector3
+    meshEquivalentForBody: THREE.Mesh
 
     constructor(mesh: Object3D, body?: CANNON.Body, needsUpdate=false, scene=undefined) {
         this.mesh = mesh
@@ -30,20 +34,23 @@ export default class PhysicalMesh implements TimeUpdater {
         this.needsUpdate = needsUpdate
         this.scene = scene
         if (!body) {
+            this.dontHaveBody = true
             this.body = this.getDefaultBody()
         }
     }
 
     update(): void {
         if (this.body) {
+            // get position from body, and convert it to Vector3
             let newPosition: CANNON.Vec3 | Vector3 = this.body.position
             newPosition = new Vector3(newPosition.x, newPosition.y, newPosition.z)
-            if (this.box) {
-                this.box = new Box3().setFromObject(this.mesh)
-                const meshOffset = this.mesh.position.sub(this.box.getCenter(new Vector3()))
-                // console.log(this.box.getCenter(new Vector3()))
-                // console.log(this.mesh.position)
-                newPosition = newPosition.add(meshOffset)
+            // if it has a box, add newPosition to offset
+            if (this.dontHaveBody) {
+                // calculate center position offset of the mesh, for updating purpose
+                const boxPosition = new Box3().setFromObject(this.mesh).getCenter(new Vector3())
+                this.centerPositionOffSet = this.mesh.position.sub(boxPosition)
+                // console.log(this.centerPositionOffSet)
+                newPosition = newPosition.add(this.centerPositionOffSet)
             }
             this.mesh.position.copy(newPosition)
             // we don't have rotation property in Body.
@@ -66,28 +73,31 @@ export default class PhysicalMesh implements TimeUpdater {
     }
 
     private getDefaultBody(): CANNON.Body {
+        // create a box that contains cube of the object3d
         const box = new Box3().setFromObject(this.mesh)
-        this.box = box
+        // box extents
         const extents = box.max.sub(box.min).multiplyScalar(1)
+        // box center position
+        const boxPosition = box.getCenter(new Vector3())
+        // Create Body Based on that box
         const shape = new CANNON.Box(new CANNON.Vec3(extents.x, extents.y, extents.z).scale(0.5))
         const body = new CANNON.Body({
             mass: 1,
-            position: new CANNON.Vec3(0, 0, 0),
+            position: new CANNON.Vec3(boxPosition.x, boxPosition.y, boxPosition.z),
             shape: shape,
             material: this.defaultMaterial
         })
-        const newPosition = box.getCenter(new Vector3())
-        body.position.set(newPosition.x, newPosition.y, newPosition.z)
+        // set the position of the body, to the center of the box
+        body.position.set(boxPosition.x, boxPosition.y, boxPosition.z)
+        // show the body wireframe in the scene, by creating a box geometry
         if (this.scene) {
             const boxGeom = new THREE.BoxGeometry(extents.x, extents.y, extents.z)
             const material = new THREE.MeshBasicMaterial({wireframe: true})
             const mesh = new Mesh(boxGeom, material)
-            mesh.position.set(0, extents.y * 0.5, 0)
-            console.log(mesh)
-            // this.mesh = mesh
+            mesh.position.copy(boxPosition)
             this.scene.add(mesh)
+            this.meshEquivalentForBody = mesh
         }
         return body
-        // return undefined
     }
 }
