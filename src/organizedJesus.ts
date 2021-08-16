@@ -276,14 +276,14 @@ gltfLoader.load(
             'run': {animation: gltf.animations[2]}
         }
         const inputs = {
-            'w': {state: 'walk', move: {direction: {x: 0, y: 0, z: -1}, speed: 10}},
-            's': {state: 'walk', move: {direction: {x: 0, y: 0, z: 1}, speed: 10}},
-            'a': {state: 'walk', move: {direction: {x: -1, y: 0, z: 0}, speed: 10}},
-            'd': {state: 'walk', move: {direction: {x: 1, y: 0, z: 0}, speed: 10}},
+            'w': {state: 'walk', move: {direction: {x: 0, y: 0, z: 0}, speed: 10}},
+            's': {state: 'walk', move: {direction: {x: 0, y: Math.PI, z: 0}, speed: 10}},
+            'a': {state: 'walk', move: {direction: {x: 0, y: Math.PI/2, z: 0}, speed: 10}},
+            'd': {state: 'walk', move: {direction: {x: 0, y: -Math.PI/2, z: 0}, speed: 10}},
         }
         // todo check thirdPerson Controller too.
         thirdPersonCameraController.person = person.mesh
-        const personController = new PersonController(person, states, inputs)
+        const personController = new PersonController(person, thirdPersonCameraController, states, inputs)
         personController.enable()
         gameEngine.personController = personController
     }

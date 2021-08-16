@@ -3,6 +3,7 @@ import {AnimationAction, AnimationClip} from "three";
 import * as THREE from 'three'
 import {VectorType} from "../../utils/Vectors";
 import TimeUpdater from "../interfaces/TimeUpdater";
+import {ThirdPersonCameraController} from "./ThirdPersonCameraController";
 
 interface State {
     animation: AnimationClip
@@ -19,13 +20,15 @@ interface Input {
 }
 export default class PersonController implements TimeUpdater {
     person: PhysicalMesh
+    cameraController: ThirdPersonCameraController
     states: {[key: string]: State}
     inputs: {[key: string]: Input}
     selectedInput: Input
     animationMixer: THREE.AnimationMixer
 
-    constructor(person: PhysicalMesh, states: { [p: string]: State }, inputs: {[key: string]: Input}) {
+    constructor(person: PhysicalMesh, cameraController: ThirdPersonCameraController, states: { [p: string]: State }, inputs: {[key: string]: Input}) {
         this.person = person;
+        this.cameraController = cameraController
         this.states = states;
         this.inputs = inputs;
         this.selectedInput = undefined
@@ -79,7 +82,15 @@ export default class PersonController implements TimeUpdater {
         // make the input move from the start
         if (this.selectedInput.move) {
             // esma hamin bashe?
-            this.person.move(this.selectedInput.move.direction, this.selectedInput.move.speed)
+            let moveDirection = this.person.mesh.position.sub(this.cameraController.camera.position).normalize()
+            moveDirection.y = 0
+            let euler = this.selectedInput.move.direction
+            euler = new THREE.Euler(euler.x, euler.y, euler.z)
+            moveDirection = moveDirection.applyEuler(<THREE.Euler>euler)
+            console.log(moveDirection)
+            // this.cameraController.updateCameraPosition()
+            this.person.move(moveDirection, this.selectedInput.move.speed)
+            // this.cameraController.updateOnMovement()
         }
     }
 
