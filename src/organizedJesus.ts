@@ -1,7 +1,6 @@
 import {Mesh, Vector3} from "three";
 import './style.css'
 import * as THREE from 'three'
-import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
 import * as dat from 'dat.gui'
 import * as CANNON from 'cannon-es'
 import {Body} from "objects/Body";
@@ -9,9 +8,7 @@ import {Shape} from "shapes/Shape";
 import {Material} from "material/Material";
 import {ContactEquation} from "cannon-es/src/equations/ContactEquation";
 import { Vec3 } from "cannon-es";
-// import {PointerLockControls} from "three/examples/jsm/controls/PointerLockControls";
 import {VectorType} from "./utils/Vectors";
-// import {toQuaternion} from "./utils/Quaternions";
 import Renderer from "./Game Engine/Renderer";
 import Scene from "./Game Engine/Objects/Scene";
 import PhysicalMesh from "./Game Engine/Objects/PhysicalMesh";
@@ -97,14 +94,19 @@ const defaultContactMaterial = new CANNON.ContactMaterial(
     }
 )
 world.defaultContactMaterial = defaultContactMaterial
-world.addContactMaterial(new CANNON.ContactMaterial(
-    new CANNON.Material('Person'),
+
+// Person Material
+const personMaterial = new CANNON.Material('Person')
+const personContactMaterial = new CANNON.ContactMaterial(
+    personMaterial,
     defaultMaterial,
     {
         friction: 0,
         restitution: 0.7
     }
-))
+)
+world.addContactMaterial(personContactMaterial)
+
 
 // Scene
 const scene = new Scene(world)
@@ -211,7 +213,12 @@ const createBox = (width: number, height: number, depth: number, position: Vecto
  */
 // Body
 const floorShape = new CANNON.Plane()
-const floorBody = new CANNON.Body()
+const floorBody = new CANNON.Body(
+    {
+        mass: 0,
+        material: defaultMaterial
+    }
+)
 floorBody.mass = 0
 floorBody.addShape(floorShape)
 floorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(- 1, 0, 0), Math.PI * 0.5)
@@ -258,12 +265,10 @@ gltfLoader.load(
         gltf.scene.children[0].scale.set(0.025, 0.025, 0.025)
         gltf.scene.children[0].position.set(0, 0, 0)
         const person = new PhysicalMesh(gltf.scene.children[0], undefined, true, scene)
-        person.body.material = new CANNON.Material('Person')
-        // person.body.material.friction = 0
-        // person.body.material.restitution = 0
-        // person.body.mass =
+        person.body.material = personMaterial
         console.log(person)
         scene.addPhysicalMesh(person)
+        console.log(world.getContactMaterial(person.body.material, defaultMaterial))
         console.log(gltf);
         const states = {
             'idle': {animation: gltf.animations[0]},

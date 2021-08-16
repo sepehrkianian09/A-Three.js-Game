@@ -19,7 +19,6 @@ class VectorType {
 export default class PhysicalMesh implements TimeUpdater {
     mesh: Object3D
     body: CANNON.Body
-    readonly defaultMaterial = new CANNON.Material('default')
     needsUpdate: boolean
     scene: Scene
 
@@ -61,7 +60,10 @@ export default class PhysicalMesh implements TimeUpdater {
     }
 
     move(direction={x: 0, y: 0, z:0}, speed=0): void {
-        this.body.velocity = new CANNON.Vec3(speed * direction.x, speed * direction.y, speed * direction.z)
+        // this.body.velocity = new CANNON.Vec3(speed * direction.x, speed * direction.y, speed * direction.z)
+        direction = new CANNON.Vec3(speed * direction.x, speed * direction.y, speed * direction.z)
+        this.body.applyImpulse(<CANNON.Vec3>direction)
+        console.log(this.body);
         // set mesh's direction to that direction, and rotate it to there
         // const vecFrom = this.rotation
         // const vecTo =
@@ -84,8 +86,7 @@ export default class PhysicalMesh implements TimeUpdater {
         const body = new CANNON.Body({
             mass: 1,
             position: new CANNON.Vec3(boxPosition.x, boxPosition.y, boxPosition.z),
-            shape: shape,
-            material: this.defaultMaterial
+            shape: shape
         })
         // set the position of the body, to the center of the box
         body.position.set(boxPosition.x, boxPosition.y, boxPosition.z)
