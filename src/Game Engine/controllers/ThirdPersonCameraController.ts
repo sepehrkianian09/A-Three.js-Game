@@ -31,7 +31,7 @@ export class ThirdPersonCameraController implements TimeUpdater {
 
     update(): void {
         // return returnThing
-        this.cameraController.update();
+        // this.cameraController.update();
         this.updateOnMovement()
     }
 
@@ -46,18 +46,13 @@ export class ThirdPersonCameraController implements TimeUpdater {
     updateOnMovement(): void {
         if (this.person) {
             // set next target to Person Position
-            this.toUpdateCameraPosition = false
             const nextTarget = this.person.position
-            this.cameraController.target.set(nextTarget.x, nextTarget.y, nextTarget.z)
-            this.cameraController.update()
-
-            // update Camera Position
             const newCameraPosition = new Vector3().copy(nextTarget).sub(this.cameraPersonOffSetVector)
+            // update camera target
+            this.cameraController.target.set(nextTarget.x, nextTarget.y, nextTarget.z)
+            // update Camera Position
             this.camera.position.copy(newCameraPosition)
-            this.toUpdateCameraPosition = true
-            // console.log('new camera position')
-            // console.log(this.camera.position)
-            // this.updateCameraPosition()
+            this.cameraController.update()
         }
     }
 
