@@ -6,3 +6,4 @@ debug the engine, and match those with organized Jesus -> 1Hours
 1th try, for physics controller engine -> 3Hours
 initiating animations for loader -> 2Hours
 debugging controllers -> 2Hours, 3Hours
+debugging person rotation on animation -> 3Hours
