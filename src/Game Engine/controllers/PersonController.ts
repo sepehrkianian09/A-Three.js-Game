@@ -46,13 +46,17 @@ export default class PersonController implements TimeUpdater {
         this.animationMixer.update(deltaTime)
     }
 
+    getMovingInputs(): Input[] {
+        return this.selectedKeys.map(value => this.inputs[value]).filter(value => !!value.move)
+    }
+
     enable() {
         document.onkeydown = (keyEvent) => {
             console.log(keyEvent);
             const keyPressed = keyEvent.key
             if (keyPressed in this.inputs && !this.selectedKeys.includes(keyPressed)) {
-                this.enableInput(keyPressed)
                 this.selectedKeys.push(keyPressed)
+                this.enableInput(keyPressed)
             }
         }
         document.onkeyup = (keyEvent) => {
@@ -61,7 +65,7 @@ export default class PersonController implements TimeUpdater {
             if (keyPressed in this.inputs && this.selectedKeys.includes(keyPressed)) {
                 this.disableInput(keyPressed)
                 this.selectedKeys = this.selectedKeys.filter(value => value !== keyPressed)
-                if (this.selectedKeys.map(value => this.inputs[value]).filter(value => !!value.move).length === 0) {
+                if (this.getMovingInputs().length === 0) {
                     this.person.stopMoving()
                 }
             }
@@ -92,7 +96,30 @@ export default class PersonController implements TimeUpdater {
             // esma hamin bashe?
             const moveDirection = this.getMoveDirection(selectedInput.move.direction)
             // this.cameraController.updateCameraPosition()
+            const movingInputs = this.getMovingInputs()
+            console.log(movingInputs)
+            const averageRotationDirection = movingInputs.map(value => {
+                const newDirection = value.move.direction
+                return new THREE.Vector3(newDirection.x, newDirection.y, newDirection.z)
+            }).reduce((sigma, current) => sigma.add(current)).divideScalar(movingInputs.length)
+            averageRotationDirection.y = averageRotationDirection.y % (2 * Math.PI)
+            if (averageRotationDirection.y < 0) {
+                averageRotationDirection.y += 2 * Math.PI
+            }
+            console.log(averageRotationDirection);
+            if (averageRotationDirection.y >= Math.PI) {
+                averageRotationDirection.y = averageRotationDirection.y - 2 * Math.PI
+            }
+            console.log(averageRotationDirection)
+            const personDirection = this.getMoveDirection(averageRotationDirection)
+            console.log(personDirection)
             this.person.move(moveDirection, selectedInput.move.speed)
+            let angle = personDirection.angleTo(new Vector3(0, 0, 1))
+            if (averageRotationDirection.y < 0) {
+                angle = 2 * Math.PI - angle
+                // angle -= Math.PI
+            }
+            this.person.mesh.children[0].rotation.copy(new THREE.Euler().set(0, angle, 0))
             // this.cameraController.updateOnMovement()
         }
     }

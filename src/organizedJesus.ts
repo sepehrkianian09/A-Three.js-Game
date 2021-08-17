@@ -19,6 +19,8 @@ import {ThirdPersonCameraController} from "./Game Engine/controllers/ThirdPerson
 import PersonController from "./Game Engine/controllers/PersonController";
 import cannonDebugger from 'cannon-es-debugger'
 
+window.THREE = THREE
+
 
 /**
  * Debug
@@ -277,7 +279,7 @@ gltfLoader.load(
     '/models/Fox/glTF/Fox.gltf',
     (gltf) =>
     {
-
+        // console.log(gltf.scen);
         gltf.scene.children[0].scale.set(0.025, 0.025, 0.025)
         gltf.scene.children[0].position.set(0, 0, 0)
         const person = new PhysicalMesh(gltf.scene.children[0], undefined, true, scene)
@@ -285,7 +287,6 @@ gltfLoader.load(
         console.log(person)
         scene.addPhysicalMesh(person)
         console.log(world.getContactMaterial(person.body.material, defaultMaterial))
-        console.log(gltf);
         const states = {
             'idle': {animation: gltf.animations[0]},
             'walk': {animation: gltf.animations[1]},
@@ -313,6 +314,9 @@ const renderer = new Renderer({
 })
 renderer.shadowMap.enabled = true
 renderer.shadowMap.type = THREE.PCFSoftShadowMap
+
+const axisHelper = new THREE.AxesHelper()
+scene.add(axisHelper)
 
 const clock = new THREE.Clock()
 const gameEngine = new GameEngine(scene, renderer, camera, thirdPersonCameraController, undefined, clock)
