@@ -1,4 +1,4 @@
-# Three.js Journey
+# A Three.js Game
 
 ## Setup
 Download [Node.js](https://nodejs.org/en/download/).
@@ -14,3 +14,6 @@ npm run dev
 # Build for production in the dist/ directory
 npm run build
 ```
+## Description
+it's a game engine, built-in by @SepehrKianian09, 
+Using 3dLibrary Three.js, And Physics Library Cannon.js
