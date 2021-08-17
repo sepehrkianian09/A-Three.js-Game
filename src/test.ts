@@ -1,6 +1,9 @@
 import * as THREE from 'three'
 import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
 import * as dat from "dat.gui";
+import CANNON from "cannon-es";
+import Scene from "./Game Engine/Objects/Scene";
+import cannonDebugger from "cannon-es-debugger";
 
 
 /**
@@ -15,7 +18,24 @@ const canvas: HTMLCanvasElement|undefined = document.getElementsByTagName('canva
 /**
  * Scene
  */
-const scene = new THREE.Scene()
+// World
+const world = new CANNON.World()
+world.broadphase = new CANNON.SAPBroadphase(world)
+world.allowSleep = true
+world.gravity.set(0, - 9.82, 0)
+
+// Default material
+const defaultMaterial = new CANNON.Material('default')
+const defaultContactMaterial = new CANNON.ContactMaterial(
+    defaultMaterial,
+    defaultMaterial,
+    {
+        friction: 0.1,
+        restitution: 0.7
+    }
+)
+world.defaultContactMaterial = defaultContactMaterial
+const scene = new Scene(world)
 
 /**
  * Meshes
@@ -23,6 +43,10 @@ const scene = new THREE.Scene()
 const floor = new THREE.PlaneGeometry(1, 1, 1)
 const material = new THREE.MeshBasicMaterial({
     color: 'white'
+})
+const body = new CANNON.Body({
+    mass: 1,
+    // shape:
 })
 const floorMesh = new THREE.Mesh(floor, material)
 scene.add(floorMesh)
@@ -85,3 +109,4 @@ const tick = () => {
 }
 
 tick()
+cannonDebugger(scene, world.bodies)
