@@ -254,6 +254,22 @@ directionalLight.position.set(5, 5, 5)
 scene.add(directionalLight)
 
 /**
+ * Camera
+ */
+// Base camera
+const camera = new PerspectiveCamera(75, 10/6, 0.1, 100)
+camera.position.set(- 3, 3, 3)
+scene.add(camera)
+
+// Controls
+const thirdPersonCameraController = new ThirdPersonCameraController(camera, canvas)
+thirdPersonCameraController.cameraController.enableDamping = true
+console.log('third person camera')
+console.log(thirdPersonCameraController)
+// const pointerLockControls = new PointerLockControls(camera, canvas)
+// thirdPersonCameraController.enableDamping = true
+
+/**
  * Fox
  */
 const gltfLoader = new GLTFLoader()
@@ -282,32 +298,12 @@ gltfLoader.load(
             'd': {state: 'walk', move: {direction: {x: 0, y: -Math.PI/2, z: 0}, speed: 10}},
         }
         // todo check thirdPerson Controller too.
-        thirdPersonCameraController.person = person.mesh
+        thirdPersonCameraController.setPerson(person.mesh)
         const personController = new PersonController(person, thirdPersonCameraController, states, inputs)
         personController.enable()
         gameEngine.personController = personController
     }
 )
-
-/**
- * Camera
- */
-// Base camera
-const camera = new PerspectiveCamera(75, 10/6, 0.1, 100)
-camera.position.set(- 3, 3, 3)
-scene.add(camera)
-
-// Controls
-const thirdPersonCameraController = new ThirdPersonCameraController(camera, canvas)
-// controls.enableKeys = true
-// gui.add(thirdPersonCameraController, 'enableKeys', false)
-// gui.add(thirdPersonCameraController, 'autoRotate')
-// gui.add(thirdPersonCameraController, 'enablePan')
-// thirdPersonCameraController.cameraController.addEventListener('')
-thirdPersonCameraController.cameraController.enableDamping = true
-console.log(thirdPersonCameraController)
-// const pointerLockControls = new PointerLockControls(camera, canvas)
-// thirdPersonCameraController.enableDamping = true
 
 /**
  * Renderer
@@ -320,4 +316,4 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap
 
 const clock = new THREE.Clock()
 const gameEngine = new GameEngine(scene, renderer, camera, thirdPersonCameraController, undefined, clock)
-cannonDebugger(scene, world.bodies)
+// cannonDebugger(scene, world.bodies)

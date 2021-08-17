@@ -45,10 +45,6 @@ export default class PhysicalMesh implements TimeUpdater {
             newPosition = new Vector3(newPosition.x, newPosition.y, newPosition.z)
             // if it has a box, add newPosition to offset
             if (this.dontHaveBody) {
-                // calculate center position offset of the mesh, for updating purpose
-                const boxPosition = new Box3().setFromObject(this.mesh).getCenter(new Vector3())
-                this.centerPositionOffSet = this.mesh.position.sub(boxPosition)
-                // console.log(this.centerPositionOffSet)
                 newPosition = newPosition.add(this.centerPositionOffSet)
             }
             this.mesh.position.copy(newPosition)
@@ -64,7 +60,7 @@ export default class PhysicalMesh implements TimeUpdater {
         direction = new CANNON.Vec3(speed * direction.x, speed * direction.y, speed * direction.z)
         this.body.applyImpulse(<CANNON.Vec3>direction)
         console.log(this.body);
-        // set mesh's direction to that direction, and rotate it to there
+        // todo set mesh's direction to that direction, and rotate it to there
         // const vecFrom = this.rotation
         // const vecTo =
         // this.rotateOnAxis()
@@ -78,9 +74,10 @@ export default class PhysicalMesh implements TimeUpdater {
         // create a box that contains cube of the object3d
         const box = new Box3().setFromObject(this.mesh)
         // box extents
-        const extents = box.max.sub(box.min).multiplyScalar(1)
+        const extents = new Vector3().copy(box.max).sub(box.min).multiplyScalar(1)
         // box center position
         const boxPosition = box.getCenter(new Vector3())
+        this.centerPositionOffSet = new Vector3().copy(this.mesh.position).sub(boxPosition)
         // Create Body Based on that box
         const shape = new CANNON.Box(new CANNON.Vec3(extents.x, extents.y, extents.z).scale(0.5))
         const body = new CANNON.Body({
@@ -91,14 +88,7 @@ export default class PhysicalMesh implements TimeUpdater {
         // set the position of the body, to the center of the box
         body.position.set(boxPosition.x, boxPosition.y, boxPosition.z)
         // show the body wireframe in the scene, by creating a box geometry
-        // if (this.scene) {
-        //     const boxGeom = new THREE.BoxGeometry(extents.x, extents.y, extents.z)
-        //     const material = new THREE.MeshBasicMaterial({wireframe: true})
-        //     const mesh = new Mesh(boxGeom, material)
-        //     mesh.position.copy(boxPosition)
-        //     this.scene.add(mesh)
-        //     this.meshEquivalentForBody = mesh
-        // }
+        // this is handled by cannon-es-debugger ;)
         return body
     }
 }
