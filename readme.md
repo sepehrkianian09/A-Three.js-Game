@@ -15,5 +15,6 @@ npm run dev
 npm run build
 ```
 ## Description
-it's a game engine, built-in by @SepehrKianian09, 
-Using 3dLibrary Three.js, And Physics Library Cannon.js
+it's a game engine, built by @SepehrKianian09.
+It couldn't been built without the brilliant ideas of my Uncle Kamran Kianian.
+It's been built Using 3dLibrary Three.js, And Physics Library Cannon.js
