@@ -16,7 +16,8 @@ module.exports = merge(
         devServer:
         {
             host: '0.0.0.0',
-            port: portFinderSync.getPort(8080),
+            port: portFinderSync.getPort(3000),
+            hot: true,
             contentBase: './dist',
             watchContentBase: true,
             open: true,
