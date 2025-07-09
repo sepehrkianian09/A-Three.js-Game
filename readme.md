@@ -1,19 +1,4 @@
 # A Three.js Game
+This is a game engine been built Using Three.js, And Physics Library Cannon.js. You can play the simulation in this [address](https://a-threejs-game-production.up.railway.app/). The snapshot of the game is shown in the picture below.
 
-## Setup
-Download [Node.js](https://nodejs.org/en/download/).
-Run this followed commands:
-
-``` bash
-# Install dependencies (only the first time)
-npm install
-
-# Run the local server at localhost:8080
-npm run dev
-
-# Build for production in the dist/ directory
-npm run build
-```
-## Description
-it's a game engine, built by @SepehrKianian09 and @mahmoudkianian.
-It's been built Using 3dLibrary Three.js, And Physics Library Cannon.js
+<img src="./assets/readme/game-snapshot.png" alt="Game Snapshot" style="display: flex; margin: 20px auto;"/>
