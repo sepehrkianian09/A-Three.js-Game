@@ -13,15 +13,3 @@ services:
     environment:
       - NODE_ENV=development
     command: ["npm", "run", "dev"]
-
-  app-prod:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      args:
-        NODE_ENV: production
-    ports:
-      - "3000:3000"
-    environment:
-      - NODE_ENV=production
-    command: ["npm", "start"]
